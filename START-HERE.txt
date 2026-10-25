@@ -1,0 +1,14 @@
+Personal Data in Informal Systems — local hackathon demo
+
+Project folder: D:\Personal Data in Informal Systems
+Website: http://127.0.0.1:8000
+
+To restart: double-click Start Demo.cmd in the project folder and keep its terminal open.
+To edit: open the project folder in VS Code.
+Choose a demo role on the sign-in screen, then click Sign in.
+
+Includes React/TypeScript frontend, FastAPI backend, local PostgreSQL, patient and staff roles, appointments, released records, consent choices, rights requests, complaints, incidents, retention register, and auditing.
+
+Verified: frontend build; 2 frontend tests; 8 backend tests; migrations and synthetic seed on PostgreSQL; all five demo logins and role endpoints; patient dashboard and records in browser.
+
+Use synthetic data only. This is a hackathon prototype, not a production or certified compliance system. Erasure is limited to reviewed appointment deletion; retention entries require verification. No third-party messaging or cloud storage integration.

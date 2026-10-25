@@ -1,0 +1,7 @@
+{
+  "source": "Local PostgreSQL: clinic_privacy / appointments",
+  "exported_at": "2026-10-25T07:17:28.055826+00:00",
+  "note": "Automatically refreshed after application database commits. Appointment details are encrypted with the local personal-data key; PostgreSQL is the source of truth. Do not edit this generated file.",
+  "count": 0,
+  "encrypted_appointments": "enc:v1:7qZ-Zi66XYX_1pCduVgtVUAGbhTjCOis8r_hP3UT"
+}

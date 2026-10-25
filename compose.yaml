@@ -1,0 +1,19 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: clinic-privacy-db
+    environment:
+      POSTGRES_DB: clinic_privacy
+      POSTGRES_USER: clinic_app
+      POSTGRES_PASSWORD: local-demo-change-this
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - clinic_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U clinic_app -d clinic_privacy"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+volumes:
+  clinic_pg_data:
