@@ -1,14 +1,14 @@
 from datetime import datetime, timedelta, timezone
 from sqlalchemy import select
 from app.models import User, ComplaintUpdate, RightsRequest
-from app.db import get_db
+from app.db import get_db; from app.data_protection import personal_data_hash
 from .conftest import TestingSession, sign_in
 
 
 def test_patient_cannot_read_another_patients_clinical_records(client):
     sign_in(client, "patient.a")
     db = TestingSession()
-    other = db.scalar(select(User).where(User.username == "patient.b"))
+    other = db.scalar(select(User).where(User.username_digest == personal_data_hash("patient.b", "user.username")))
     response = client.get(f"/api/staff/patients/{other.id}/records")
     assert response.status_code == 403
     db.close()
@@ -74,7 +74,7 @@ def test_security_admin_only_can_create_incident(client):
 
 def test_appointment_conflict_for_same_provider_is_rejected(client):
     db = TestingSession()
-    doctor = db.scalar(select(User).where(User.username == "doctor"))
+    doctor = db.scalar(select(User).where(User.username_digest == personal_data_hash("doctor", "user.username")))
     provider_id = doctor.id
     db.close()
     sign_in(client, "patient.a")

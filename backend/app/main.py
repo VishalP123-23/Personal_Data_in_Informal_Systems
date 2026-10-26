@@ -20,9 +20,12 @@ from .security import hash_password, verify_password, new_token, token_hash
 from .data_protection import personal_data_hash, mask_contact_value
 
 app = FastAPI(title="Clinic Patient Privacy", version="0.1.0", description="Local synthetic-data hackathon demo")
-app.add_middleware(CORSMiddleware, allow_origins=[settings.allowed_origin], allow_credentials=True,
+app.add_middleware(CORSMiddleware, allow_origins=settings.allowed_origins,
+                   allow_origin_regex=r"https://.*\.vercel\.app" if settings.app_env != "local-demo" else None,
+                   allow_credentials=True,
                    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-                   allow_headers=["Content-Type", "X-CSRF-Token", "X-Request-ID"])
+                   allow_headers=["Content-Type", "X-CSRF-Token", "X-Request-ID"],
+                   expose_headers=["X-CSRF-Token", "X-Request-ID"])
 
 attempts = defaultdict(deque)
 COOKIE_NAME = "clinic_session"
@@ -192,9 +195,10 @@ def issue_login_session(user, response, request, db):
     audit(db, user.id, "auth.login", "user", user.id, request)
     db.commit()
     response.set_cookie(COOKIE_NAME, raw, httponly=True, secure=settings.cookie_secure,
-                        samesite="strict", max_age=settings.session_ttl_hours * 3600, path="/")
+                        samesite=settings.cookie_samesite, max_age=settings.session_ttl_hours * 3600, path="/")
     response.set_cookie(CSRF_COOKIE, csrf, httponly=False, secure=settings.cookie_secure,
-                        samesite="strict", max_age=settings.session_ttl_hours * 3600, path="/")
+                        samesite=settings.cookie_samesite, max_age=settings.session_ttl_hours * 3600, path="/")
+    response.headers["X-CSRF-Token"] = csrf
     return user_out(user)
 
 
@@ -206,8 +210,8 @@ def logout(response: Response, request: Request, user: m.User = Depends(current_
         db.delete(session)
     audit(db, user.id, "auth.logout", "user", user.id, request)
     db.commit()
-    response.delete_cookie(COOKIE_NAME, path="/", secure=settings.cookie_secure, httponly=True, samesite="strict")
-    response.delete_cookie(CSRF_COOKIE, path="/", secure=settings.cookie_secure, samesite="strict")
+    response.delete_cookie(COOKIE_NAME, path="/", secure=settings.cookie_secure, httponly=True, samesite=settings.cookie_samesite)
+    response.delete_cookie(CSRF_COOKIE, path="/", secure=settings.cookie_secure, samesite=settings.cookie_samesite)
     return {"ok": True}
 
 
